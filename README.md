@@ -97,37 +97,13 @@ end.
 ```
 
 ---
-
-# |> Документация :blue_book:
-### `Elixir treats documentation as a first-class citizen` - из доки
-# 
-
-```elixir
-defmodule IRC.Command do
-  @doc ~S"""
-  Парсит IRC комманду в кортеж.
-    iex> IRC.Command.parse("USER guest 0 * :Ronnie Reagan")
-    {:ok, {:user, "guest", "0", "Ronnie Reagan"}}
-    
-    iex> IRC.Command.parse("USER 2340-230489 923")
-    {:ok, :user}
-  """
-  
-  def parse(line) do
-    line
-    |> String.split
-    |> case do
-        ...
-  end
-end  
+# |> Атомы (очень похожи на Symbols) :four_leaf_clover:
+Очень удобны для обмена сообщениями между процессами
 ```
-###### то что в @doc попадает в ExUnit и там выполняется
----
-
-# |> То есть :blue_book:
-
-Пишем документацию и одновременно тесты, говорят это удобно. Так же практикуется в Python.
-
+#iex> :hello
+:hello
+```
+###### * не создавайте в памяти много атомов - от них сильно течет память
 ---
 
 # |> Pattern matching :heart:
@@ -172,9 +148,72 @@ defmodule M3.API.V1.ProfileController do
   end
 end  
 ```
+
 ---
 
-# |> MOAR
+# |>  Pipe Operator (`|>`) :pray:
+
+Можем переписать: 
+```elixir
+foo(bar(baz(new_function(other_function()))))
+```
+Так:
+```elixir
+other_function() |> new_function() |> baz() |> bar() |> foo()
+```
+
+###### *передает в следующую функцию в цепочке первым аргументом результат выполнения предыдущей
+
+---
+# |> Pipe Operator , ближе к практике
+```elixir
+  def search(current_user, name, page) do
+    name = name |> String.trim
+
+    current_user
+      |> build_subquery(name)
+      |> build_query(name)
+      |> paginate(page)
+      |> Repo.all
+  end
+```
+
+###### практический пример: код построение SQL запроса
+---
+
+# |> Документация :blue_book:
+### `Elixir treats documentation as a first-class citizen` - из доки
+# 
+
+```elixir
+defmodule IRC.Command do
+  @doc ~S"""
+  Парсит IRC комманду в кортеж.
+    iex> IRC.Command.parse("USER guest 0 * :Ronnie Reagan")
+    {:ok, {:user, "guest", "0", "Ronnie Reagan"}}
+    
+    iex> IRC.Command.parse("USER 2340-230489 923")
+    {:ok, :user}
+  """
+  
+  def parse(line) do
+    line
+    |> String.split
+    |> case do
+        ...
+  end
+end  
+```
+###### то что в @doc попадает в ExUnit и там выполняется
+---
+
+# |> То есть :blue_book:
+
+Пишем документацию и одновременно тесты, говорят это удобно. Так же практикуется в Python.
+
+---
+
+# |> Pattern matching, atoms, pipe operator
 
 ```elixir
 
@@ -193,46 +232,6 @@ end
     |> write_line(socket)
 ```
 ###### if, case, for - это тоже функции
-
----
-
-# |>  Pipe Operator (`|>`) :pray:
-
-Можем переписать: 
-```elixir
-foo(bar(baz(new_function(other_function()))))
-```
-Так:
-```elixir
-other_function() |> new_function() |> baz() |> bar() |> foo()
-```
-
-###### *передает в следующую функцию в цепочке первым аргументом результат выполнения предыдущей
-
----
-# |> Атомы (очень похоже на Symbols) :four_leaf_clover:
-
-```
-def foo(:bar), do: "foobar"
-def foo, do: "foo"
-```
-
----
-# |> Pipe Operator , ближе к практике
-```elixir
-  def search(current_user, name, page) do
-    name = name |> String.trim
-
-    current_user
-      |> build_subquery(name)
-      |> build_query(name)
-      |> paginate(page)
-      |> Repo.all
-  end
-```
-
-###### практический пример: код построение SQL запроса
-
 ---
 
 # |> Пример построения и сложного SQL запроса на ruby
@@ -324,7 +323,7 @@ defmodule CreateSearch do
   defp create_or_bump(%User{} = owner, %Post{} = post) do
     owner
     # pipe operator!
-    |> Post.find_search(post)
+    |> find_search(post)
     |> Repo.one
     |> case do
          nil -> owner |> create_search(post)
@@ -391,6 +390,18 @@ end
 
 ---
 
+# Что это такое :confused:
+- виртуальная машина
+- встроенная СУБД Mnesia
+- ets (встроенный из короки Redis)
+- RPC из коробки, очень просто построить кластер
+- отладчик
+- процессы можно визуально отлаживать
+- взаимодействие с другими языками
+- слабая типизация путем описания контрактов между функциями (отдельно)
+
+---
+
 # Важно правильно выстроить взаимодействие процессов :traffic_light:
 Процессы делятся на два типа:
 * процессы которые что-то делают
@@ -413,17 +424,6 @@ end
 - процесс - как запущенный инстанс объекта
 - message-passing - можно утрировать как вызов методов
 - behaviour - схож с интерфейсами
----
-
-# Что еще? :confused:
-- встроенная СУБД Mnesia
-- ets (встроенный из короки Redis)
-- RPC из коробки, очень просто построить кластер
-- отладка на удаленной машине
-- процессы можно визуально отлаживать
-- взаимодействие с другими языками
-- слабая типизация путем описания контрактов между функциями
-
 ---
 
 Инструменты :electric_plug:
